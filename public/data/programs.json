@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "Pelatihan Keterampilan Pemuda",
+    "description": "Program pelatihan keterampilan untuk pemuda Sukamaju dalam bidang teknologi dan wirausaha",
+    "status": "ongoing",
+    "startDate": "2025-07-01",
+    "endDate": "2025-09-30"
+  },
+  {
+    "id": 2,
+    "title": "Turnamen Olahraga Antar RT",
+    "description": "Turnamen olahraga antar RT se-Sukamaju untuk mempererat silaturahmi",
+    "status": "upcoming",
+    "startDate": "2025-10-15",
+    "endDate": "2025-10-20"
+  },
+  {
+    "id": 3,
+    "title": "Bakti Sosial Santunan Anak Yatim",
+    "description": "Kegiatan santunan untuk anak yatim dan dhuafa di lingkungan Sukamaju",
+    "status": "completed",
+    "startDate": "2025-01-10",
+    "endDate": "2025-01-10"
+  }
+]

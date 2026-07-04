@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "title": "Kerja Bakti Lingkungan",
+    "description": "Kegiatan kerja bakti membersihkan lingkungan Sukamaju",
+    "image": "/storage/gallery/kerja-bakti.jpg",
+    "date": "2025-06-15"
+  },
+  {
+    "id": 2,
+    "title": "Lomba 17 Agustusan",
+    "description": "Perayaan Hari Kemerdekaan RI ke-80",
+    "image": "/storage/gallery/lomba-agustus.jpg",
+    "date": "2025-08-17"
+  },
+  {
+    "id": 3,
+    "title": "Pengajian Rutin",
+    "description": "Kegiatan pengajian rutin bulanan karang taruna",
+    "image": "/storage/gallery/pengajian.jpg",
+    "date": "2025-05-20"
+  }
+]

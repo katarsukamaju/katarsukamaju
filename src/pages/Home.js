@@ -1,15 +1,23 @@
+import Navbar from '../components/Navbar';
 import HeroSection from '../components/HeroSection';
-import ProfileSection from '../components/ProfileSection';
-import DivisiGrid from '../components/DivisiGrid';
-import ContactFooter from '../components/ContactFooter';
+import AboutSection from '../components/AboutSection';
+import GallerySection from '../components/GallerySection';
+import ProgramSection from '../components/ProgramSection';
+import DivisiSection from '../components/DivisiSection';
+import ContactSection from '../components/ContactSection';
+import Footer from '../components/Footer';
 
 export default function Home() {
   return (
     <main>
+      <Navbar />
       <HeroSection />
-      <ProfileSection />
-      <DivisiGrid />
-      <ContactFooter />
+      <AboutSection />
+      <GallerySection />
+      <ProgramSection />
+      <DivisiSection />
+      <ContactSection />
+      <Footer />
     </main>
   );
 }
