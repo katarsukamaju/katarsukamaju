@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from '../i18n/useTranslation';
+import { FiArrowDown } from 'react-icons/fi';
 
 export default function HeroSection() {
   const { t } = useTranslation();
@@ -9,37 +10,51 @@ export default function HeroSection() {
     const el = textRef.current;
     if (!el) return;
     el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
+    el.style.transform = 'translateY(40px)';
     requestAnimationFrame(() => {
-      el.style.transition = 'opacity 1s ease-out, transform 1s ease-out';
+      el.style.transition = 'opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)';
       el.style.opacity = '1';
       el.style.transform = 'translateY(0)';
     });
   }, []);
 
+  const scrollNext = () => {
+    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary-700 via-primary-600 to-blue-800">
-      <div className="absolute inset-0 opacity-15">
-        <div className="absolute top-20 left-20 w-80 h-80 bg-yellow-300 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-300 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s', animationDuration: '5s' }} />
-        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-purple-400 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s', animationDuration: '6s' }} />
+    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-900 via-primary-900 to-blue-950">
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/4 -right-32 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-400/5 rounded-full blur-[150px]" />
       </div>
 
-      <div ref={textRef} className="relative z-10 text-center px-4 max-w-4xl">
-        <span className="inline-block px-4 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-white/80 text-sm font-medium mb-6 border border-white/10">
-          Karang Taruna Sukamaju
+      <div ref={textRef} className="relative z-10 text-center px-6 max-w-5xl">
+        <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white/80 text-[13px] font-medium tracking-[0.15em] uppercase mb-8 border border-white/10">
+          {t('hero_badge')}
         </span>
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight tracking-tight">
+
+        <h1 className="text-display sm:text-[5rem] md:text-[6rem] lg:text-[7rem] font-black text-white leading-[0.95] tracking-[-0.04em] mb-8">
           {t('hero_title')}
         </h1>
-        <p className="text-lg sm:text-xl text-blue-100/90 max-w-2xl mx-auto leading-relaxed font-light">
+
+        <p className="text-base sm:text-lg md:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed font-normal tracking-wide">
           {t('hero_subtitle')}
         </p>
+
+        <div className="mt-12 flex items-center justify-center gap-4">
+          <button onClick={scrollNext}
+            className="group inline-flex items-center gap-2.5 px-8 py-3.5 bg-white text-gray-900 rounded-2xl text-sm font-semibold tracking-wide hover:bg-white/90 transition-all duration-300 shadow-xl shadow-black/10">
+            {t('hero_cta')}
+            <FiArrowDown className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+          </button>
+        </div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-1">
-          <div className="w-1.5 h-3 bg-white/50 rounded-full" />
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+        <div className="w-5 h-8 border-2 border-white/20 rounded-full flex items-start justify-center p-1">
+          <div className="w-1 h-2.5 bg-white/40 rounded-full animate-bounce" />
         </div>
       </div>
     </section>

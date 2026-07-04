@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { FiSun, FiMoon, FiGlobe, FiMenu, FiX } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { FiSun, FiMoon, FiGlobe, FiMenu, FiX, FiChevronRight } from 'react-icons/fi';
 
 const sections = [
   { id: 'home', label_id: 'Beranda', label_en: 'Home' },
   { id: 'about', label_id: 'Tentang', label_en: 'About' },
   { id: 'gallery', label_id: 'Galeri', label_en: 'Gallery' },
-  { id: 'program', label_id: 'Program', label_en: 'Program' },
+  { id: 'program', label_id: 'Program', label_en: 'Programs' },
   { id: 'divisi', label_id: 'Divisi', label_en: 'Divisions' },
   { id: 'contact', label_id: 'Kontak', label_en: 'Contact' },
 ];
@@ -20,8 +19,8 @@ export default function Navbar() {
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 50);
-      const scrollY = window.scrollY + 120;
+      setScrolled(window.scrollY > 60);
+      const scrollY = window.scrollY + 140;
       for (const s of sections) {
         const el = document.getElementById(s.id);
         if (el && scrollY >= el.offsetTop && scrollY < el.offsetTop + el.offsetHeight) {
@@ -39,46 +38,78 @@ export default function Navbar() {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
-      <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-        <button onClick={() => scrollTo('home')} className="flex items-center gap-2">
-          <span className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">KT</span>
-          <span className="font-semibold text-gray-800 dark:text-white text-sm">Sukamaju</span>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      scrolled
+        ? 'bg-white/90 dark:bg-surface-900/90 backdrop-blur-2xl border-b border-gray-100 dark:border-gray-800/50'
+        : 'bg-transparent'
+    }`}>
+      <div className="max-w-6xl mx-auto px-6 h-[72px] flex items-center justify-between">
+        <button onClick={() => scrollTo('home')} className="flex items-center gap-3 group">
+          <span className="w-9 h-9 bg-primary-600 dark:bg-primary-500 rounded-xl flex items-center justify-center text-white font-bold text-sm group-hover:scale-105 transition-transform">KT</span>
+          <span className={`font-medium text-sm tracking-wide ${scrolled ? 'text-gray-800 dark:text-white' : 'text-white'}`}>Sukamaju</span>
         </button>
 
         <div className="hidden md:flex items-center gap-1">
           {sections.map(s => (
             <button key={s.id} onClick={() => scrollTo(s.id)}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${active === s.id ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : scrolled ? 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white' : 'text-white/80 hover:text-white'}`}>
+              className={`relative px-4 py-2 text-[13px] font-medium tracking-wide transition-all duration-300 ${
+                active === s.id
+                  ? scrolled
+                    ? 'text-primary-600 dark:text-primary-400'
+                    : 'text-white'
+                  : scrolled
+                    ? 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white'
+                    : 'text-white/70 hover:text-white'
+              }`}>
               {lang === 'id' ? s.label_id : s.label_en}
+              {active === s.id && (
+                <span className={`absolute -bottom-px left-4 right-4 h-[2px] rounded-full transition-colors ${
+                  scrolled ? 'bg-primary-500 dark:bg-primary-400' : 'bg-white'
+                }`} />
+              )}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-1">
-          <button onClick={toggleLang} className={`p-2 rounded-lg transition-colors ${scrolled ? 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' : 'text-white/80 hover:text-white hover:bg-white/10'}`}>
-            <FiGlobe className="w-4 h-4" />
-            <span className="text-xs font-medium ml-0.5">{lang.toUpperCase()}</span>
+        <div className="flex items-center gap-0.5">
+          <button onClick={toggleLang} className={`p-2.5 rounded-xl transition-all duration-300 ${
+            scrolled
+              ? 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-surface-800'
+              : 'text-white/70 hover:text-white hover:bg-white/10'
+          }`}>
+            <FiGlobe className="w-[15px] h-[15px]" />
+            <span className="text-[10px] font-semibold ml-0.5 tracking-widest">{lang.toUpperCase()}</span>
           </button>
-          <button onClick={toggleTheme} className={`p-2 rounded-lg transition-colors ${scrolled ? 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' : 'text-white/80 hover:text-white hover:bg-white/10'}`}>
-            {theme === 'light' ? <FiMoon className="w-4 h-4" /> : <FiSun className="w-4 h-4" />}
+          <button onClick={toggleTheme} className={`p-2.5 rounded-xl transition-all duration-300 ${
+            scrolled
+              ? 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-surface-800'
+              : 'text-white/70 hover:text-white hover:bg-white/10'
+          }`}>
+            {theme === 'light' ? <FiMoon className="w-[15px] h-[15px]" /> : <FiSun className="w-[15px] h-[15px]" />}
           </button>
-          <Link to="/admin" className={`p-2 rounded-lg text-xs font-medium transition-colors ${scrolled ? 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800' : 'text-white/80 hover:text-white hover:bg-white/10'}`}>
-            Admin
-          </Link>
-          <button onClick={() => setOpen(!open)} className={`md:hidden p-2 rounded-lg transition-colors ${scrolled ? 'text-gray-600 dark:text-gray-300' : 'text-white/80'}`}>
-            {open ? <FiX className="w-5 h-5" /> : <FiMenu className="w-5 h-5" />}
+
+          <button onClick={() => setOpen(!open)} className={`md:hidden ml-1 p-2.5 rounded-xl transition-all ${
+            scrolled
+              ? 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-surface-800'
+              : 'text-white/70 hover:text-white hover:bg-white/10'
+          }`}>
+            {open ? <FiX className="w-[18px] h-[18px]" /> : <FiMenu className="w-[18px] h-[18px]" />}
           </button>
         </div>
       </div>
 
       {open && (
-        <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 shadow-lg">
-          <div className="px-4 py-3 space-y-1">
+        <div className="md:hidden bg-white dark:bg-surface-900 border-t border-gray-100 dark:border-gray-800 shadow-elevated">
+          <div className="px-4 py-3 space-y-0.5">
             {sections.map(s => (
               <button key={s.id} onClick={() => scrollTo(s.id)}
-                className={`block w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${active === s.id ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-300'}`}>
+                className={`flex items-center justify-between w-full px-4 py-3.5 rounded-xl text-sm font-medium transition-colors ${
+                  active === s.id
+                    ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-surface-800'
+                }`}>
                 {lang === 'id' ? s.label_id : s.label_en}
+                <FiChevronRight className={`w-4 h-4 ${active === s.id ? 'text-primary-500' : 'text-gray-300 dark:text-gray-600'}`} />
               </button>
             ))}
           </div>
