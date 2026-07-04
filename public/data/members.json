@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "division": "Ketua",
+    "members": [
+      { "name": "Aris Darmawan", "position": "Ketua Karang Taruna", "slug": "aris-darmawan" }
+    ]
+  },
+  {
+    "id": 2,
+    "division": "Wakil Ketua",
+    "members": [
+      { "name": "Siti Nurhaliza", "position": "Wakil Ketua", "slug": "siti-nurhaliza" }
+    ]
+  },
+  {
+    "id": 3,
+    "division": "Sekretaris",
+    "members": [
+      { "name": "Bambang Supriyadi", "position": "Sekretaris 1", "slug": "bambang-supriyadi" },
+      { "name": "Dewi Sartika", "position": "Sekretaris 2", "slug": "dewi-sartika" }
+    ]
+  },
+  {
+    "id": 4,
+    "division": "Bendahara",
+    "members": [
+      { "name": "Ratna Kusuma", "position": "Bendahara 1", "slug": "ratna-kusuma" },
+      { "name": "Agus Wijaya", "position": "Bendahara 2", "slug": "agus-wijaya" }
+    ]
+  },
+  {
+    "id": 5,
+    "division": "Bidang Olahraga",
+    "members": [
+      { "name": "Rudi Hermawan", "position": "Koordinator Olahraga", "slug": "rudi-hermawan" },
+      { "name": "Fitri Handayani", "position": "Anggota", "slug": "fitri-handayani" },
+      { "name": "Doni Prasetyo", "position": "Anggota", "slug": "doni-prasetyo" }
+    ]
+  },
+  {
+    "id": 6,
+    "division": "Bidang Seni & Budaya",
+    "members": [
+      { "name": "Maya Anggraini", "position": "Koordinator Seni", "slug": "maya-anggraini" },
+      { "name": "Joko Susilo", "position": "Anggota", "slug": "joko-susilo" }
+    ]
+  },
+  {
+    "id": 7,
+    "division": "Bidang Sosial",
+    "members": [
+      { "name": "Hasan Basri", "position": "Koordinator Sosial", "slug": "hasan-basri" },
+      { "name": "Nina Marlina", "position": "Anggota", "slug": "nina-marlina" },
+      { "name": "Asep Saepudin", "position": "Anggota", "slug": "asep-saepudin" }
+    ]
+  },
+  {
+    "id": 8,
+    "division": "Bidang Pendidikan",
+    "members": [
+      { "name": "Rina Puspita", "position": "Koordinator Pendidikan", "slug": "rina-puspita" },
+      { "name": "Taufik Hidayat", "position": "Anggota", "slug": "taufik-hidayat" }
+    ]
+  }
+]
