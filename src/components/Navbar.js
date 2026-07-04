@@ -8,6 +8,7 @@ const sections = [
   { id: 'gallery', label_id: 'Galeri', label_en: 'Gallery' },
   { id: 'program', label_id: 'Program', label_en: 'Programs' },
   { id: 'divisi', label_id: 'Divisi', label_en: 'Divisions' },
+  { id: 'layanan', label_id: 'Layanan', label_en: 'Services' },
   { id: 'contact', label_id: 'Kontak', label_en: 'Contact' },
 ];
 
