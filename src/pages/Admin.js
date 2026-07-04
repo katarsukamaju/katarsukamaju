@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from '../i18n/useTranslation';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { FiSave, FiAlertCircle, FiCheckCircle, FiArrowLeft, FiUsers, FiImage, FiCalendar, FiSettings } from 'react-icons/fi';
+import { FiSave, FiAlertCircle, FiCheckCircle, FiArrowLeft, FiUsers, FiImage, FiCalendar, FiSettings, FiRefreshCw } from 'react-icons/fi';
 
 const tabs = [
   { key: 'members', icon: FiUsers },
@@ -16,11 +16,24 @@ export default function Admin() {
   const { theme, toggleTheme } = useApp();
   const [tab, setTab] = useState('members');
   const [toast, setToast] = useState(null);
+  const [data, setData] = useState({ members: [], gallery: [], programs: [], settings: null });
 
   const [memberForm, setMemberForm] = useState({ name: '', division: '', position: '', photo: null });
   const [galleryForm, setGalleryForm] = useState({ title: '', description: '', image: '' });
   const [programForm, setProgramForm] = useState({ title: '', description: '', status: 'upcoming', startDate: '', endDate: '' });
   const [settingsForm, setSettingsForm] = useState({ whatsapp: '', instagram: '', email: '' });
+
+  const loadData = () => {
+    fetch('/data/members.json').then(r => r.json()).then(d => setData(p => ({ ...p, members: d }))).catch(() => {});
+    fetch('/data/gallery.json').then(r => r.json()).then(d => setData(p => ({ ...p, gallery: d }))).catch(() => {});
+    fetch('/data/programs.json').then(r => r.json()).then(d => setData(p => ({ ...p, programs: d }))).catch(() => {});
+    fetch('/data/settings.json').then(r => r.json()).then(d => {
+      setData(p => ({ ...p, settings: d }));
+      setSettingsForm({ whatsapp: d.whatsapp || '', instagram: d.instagram || '', email: d.email || '' });
+    }).catch(() => {});
+  };
+
+  useEffect(() => { loadData() }, []);
 
   const showToast = (type, message) => {
     setToast({ type, message });
@@ -42,90 +55,61 @@ export default function Admin() {
     }
     const slug = memberForm.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     let photoBase64 = null;
-    if (memberForm.photo) {
-      photoBase64 = await fileToBase64(memberForm.photo);
-    }
+    if (memberForm.photo) photoBase64 = await fileToBase64(memberForm.photo);
     try {
       const res = await fetch('/api/github-commit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'member', name: memberForm.name, division: memberForm.division, position: memberForm.position, slug, photo: photoBase64 })
       });
-      const data = await res.json();
-      if (data.success) {
-        showToast('success', tr('admin_success'));
-        setMemberForm({ name: '', division: '', position: '', photo: null });
-      } else showToast('error', data.error || tr('admin_error'));
-    } catch {
-      showToast('error', tr('admin_error'));
-    }
+      const d = await res.json();
+      if (d.success) { showToast('success', tr('admin_success')); setMemberForm({ name: '', division: '', position: '', photo: null }); loadData(); }
+      else showToast('error', d.error || tr('admin_error'));
+    } catch { showToast('error', tr('admin_error')); }
   };
 
   const handleGallerySubmit = async (e) => {
     e.preventDefault();
-    if (!galleryForm.title || !galleryForm.image) {
-      showToast('error', 'Judul dan URL gambar wajib diisi');
-      return;
-    }
+    if (!galleryForm.title || !galleryForm.image) { showToast('error', 'Judul dan URL gambar wajib diisi'); return; }
     try {
       const res = await fetch('/api/github-commit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'gallery', ...galleryForm })
       });
-      const data = await res.json();
-      if (data.success) {
-        showToast('success', tr('admin_success'));
-        setGalleryForm({ title: '', description: '', image: '' });
-      } else showToast('error', data.error || tr('admin_error'));
-    } catch {
-      showToast('error', tr('admin_error'));
-    }
+      const d = await res.json();
+      if (d.success) { showToast('success', tr('admin_success')); setGalleryForm({ title: '', description: '', image: '' }); loadData(); }
+      else showToast('error', d.error || tr('admin_error'));
+    } catch { showToast('error', tr('admin_error')); }
   };
 
   const handleProgramSubmit = async (e) => {
     e.preventDefault();
-    if (!programForm.title) {
-      showToast('error', 'Nama program wajib diisi');
-      return;
-    }
+    if (!programForm.title) { showToast('error', 'Nama program wajib diisi'); return; }
     try {
       const res = await fetch('/api/github-commit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'program', ...programForm })
       });
-      const data = await res.json();
-      if (data.success) {
-        showToast('success', tr('admin_success'));
-        setProgramForm({ title: '', description: '', status: 'upcoming', startDate: '', endDate: '' });
-      } else showToast('error', data.error || tr('admin_error'));
-    } catch {
-      showToast('error', tr('admin_error'));
-    }
+      const d = await res.json();
+      if (d.success) { showToast('success', tr('admin_success')); setProgramForm({ title: '', description: '', status: 'upcoming', startDate: '', endDate: '' }); loadData(); }
+      else showToast('error', d.error || tr('admin_error'));
+    } catch { showToast('error', tr('admin_error')); }
   };
 
   const handleSettingsSubmit = async (e) => {
     e.preventDefault();
-    if (!settingsForm.whatsapp && !settingsForm.instagram && !settingsForm.email) {
-      showToast('error', 'Isi minimal satu field');
-      return;
-    }
+    if (!settingsForm.whatsapp && !settingsForm.instagram && !settingsForm.email) { showToast('error', 'Isi minimal satu field'); return; }
     try {
       const res = await fetch('/api/github-commit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'settings', ...settingsForm })
       });
-      const data = await res.json();
-      if (data.success) {
-        showToast('success', tr('admin_success'));
-      } else showToast('error', data.error || tr('admin_error'));
-    } catch {
-      showToast('error', tr('admin_error'));
-    }
+      const d = await res.json();
+      if (d.success) { showToast('success', tr('admin_success')); loadData(); }
+      else showToast('error', d.error || tr('admin_error'));
+    } catch { showToast('error', tr('admin_error')); }
   };
 
+  const card = "bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:border dark:border-gray-700";
   const inputClass = "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-sm";
   const labelClass = "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1";
 
@@ -137,8 +121,8 @@ export default function Admin() {
             <FiArrowLeft className="w-4 h-4" />
             <span className="text-sm font-medium">{tr('admin_title')}</span>
           </Link>
-          <button onClick={toggleTheme} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors">
-            <FiSettings className="w-4 h-4" />
+          <button onClick={loadData} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-400 dark:text-gray-500 transition-colors" title="Refresh">
+            <FiRefreshCw className="w-4 h-4" />
           </button>
         </div>
       </div>
@@ -157,102 +141,154 @@ export default function Admin() {
         </div>
 
         {tab === 'members' && (
-          <form onSubmit={handleMemberSubmit} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:border dark:border-gray-700 space-y-4">
-            <div>
-              <label className={labelClass}>{tr('admin_member_name')}</label>
-              <input type="text" value={memberForm.name} onChange={e => setMemberForm(f => ({ ...f, name: e.target.value }))} className={inputClass} />
+          <div className="space-y-6">
+            <div className={card}>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">Data Anggota Saat Ini</h3>
+              {data.members.length === 0 ? (
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">Belum ada data anggota</p>
+              ) : (
+                <div className="space-y-3">
+                  {data.members.map(div => (
+                    <div key={div.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                      <p className="text-sm font-semibold text-gray-800 dark:text-white mb-2">{div.division} ({div.members.length} anggota)</p>
+                      <div className="space-y-1.5">
+                        {div.members.map((m, i) => (
+                          <div key={i} className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-primary-400 flex-shrink-0" />
+                            <span className="font-medium">{m.name}</span>
+                            <span className="text-gray-400 dark:text-gray-500">— {m.position}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <div>
-              <label className={labelClass}>{tr('admin_member_division')}</label>
-              <input type="text" value={memberForm.division} onChange={e => setMemberForm(f => ({ ...f, division: e.target.value }))} className={inputClass} />
-            </div>
-            <div>
-              <label className={labelClass}>{tr('admin_member_position')}</label>
-              <input type="text" value={memberForm.position} onChange={e => setMemberForm(f => ({ ...f, position: e.target.value }))} className={inputClass} />
-            </div>
-            <div>
-              <label className={labelClass}>{tr('admin_member_photo')}</label>
-              <input type="file" accept="image/*" onChange={e => setMemberForm(f => ({ ...f, photo: e.target.files[0] || null }))}
-                className="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 dark:file:bg-primary-900/30 file:text-primary-600 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-primary-900/50 transition-colors" />
-            </div>
-            <button type="submit" className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2">
-              <FiSave className="w-4 h-4" /> {tr('admin_save')}
-            </button>
-          </form>
+
+            <form onSubmit={handleMemberSubmit} className={card + " space-y-4"}>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">Tambah Anggota Baru</h3>
+              <div><label className={labelClass}>{tr('admin_member_name')}</label><input type="text" value={memberForm.name} onChange={e => setMemberForm(f => ({ ...f, name: e.target.value }))} className={inputClass} /></div>
+              <div><label className={labelClass}>{tr('admin_member_division')}</label><input type="text" value={memberForm.division} onChange={e => setMemberForm(f => ({ ...f, division: e.target.value }))} className={inputClass} /></div>
+              <div><label className={labelClass}>{tr('admin_member_position')}</label><input type="text" value={memberForm.position} onChange={e => setMemberForm(f => ({ ...f, position: e.target.value }))} className={inputClass} /></div>
+              <div>
+                <label className={labelClass}>{tr('admin_member_photo')}</label>
+                <input type="file" accept="image/*" onChange={e => setMemberForm(f => ({ ...f, photo: e.target.files[0] || null }))}
+                  className="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 dark:file:bg-primary-900/30 file:text-primary-600 dark:file:text-primary-400 hover:file:bg-primary-100 dark:hover:file:bg-primary-900/50 transition-colors" />
+              </div>
+              <button type="submit" className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2">
+                <FiSave className="w-4 h-4" /> {tr('admin_save')}
+              </button>
+            </form>
+          </div>
         )}
 
         {tab === 'gallery' && (
-          <form onSubmit={handleGallerySubmit} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:border dark:border-gray-700 space-y-4">
-            <div>
-              <label className={labelClass}>{tr('admin_gallery_title')}</label>
-              <input type="text" value={galleryForm.title} onChange={e => setGalleryForm(f => ({ ...f, title: e.target.value }))} className={inputClass} />
+          <div className="space-y-6">
+            <div className={card}>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">Data Galeri Saat Ini</h3>
+              {data.gallery.length === 0 ? (
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">Belum ada data galeri</p>
+              ) : (
+                <div className="space-y-3">
+                  {data.gallery.map(item => (
+                    <div key={item.id} className="flex items-center gap-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                      <div className="w-16 h-12 rounded-lg bg-gray-200 dark:bg-gray-600 overflow-hidden flex-shrink-0">
+                        <img src={item.image} alt="" className="w-full h-full object-cover" onError={e => e.target.style.display = 'none'} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">{item.title}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{item.date}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <div>
-              <label className={labelClass}>{tr('admin_gallery_desc')}</label>
-              <textarea value={galleryForm.description} onChange={e => setGalleryForm(f => ({ ...f, description: e.target.value }))} rows={3} className={inputClass + " resize-none"} />
-            </div>
-            <div>
-              <label className={labelClass}>{tr('admin_gallery_image')}</label>
-              <input type="text" value={galleryForm.image} onChange={e => setGalleryForm(f => ({ ...f, image: e.target.value }))} placeholder="/storage/gallery/foto.jpg" className={inputClass} />
-            </div>
-            <button type="submit" className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2">
-              <FiSave className="w-4 h-4" /> {tr('admin_save')}
-            </button>
-          </form>
+
+            <form onSubmit={handleGallerySubmit} className={card + " space-y-4"}>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">Tambah Galeri Baru</h3>
+              <div><label className={labelClass}>{tr('admin_gallery_title')}</label><input type="text" value={galleryForm.title} onChange={e => setGalleryForm(f => ({ ...f, title: e.target.value }))} className={inputClass} /></div>
+              <div><label className={labelClass}>{tr('admin_gallery_desc')}</label><textarea value={galleryForm.description} onChange={e => setGalleryForm(f => ({ ...f, description: e.target.value }))} rows={3} className={inputClass + " resize-none"} /></div>
+              <div><label className={labelClass}>{tr('admin_gallery_image')}</label><input type="text" value={galleryForm.image} onChange={e => setGalleryForm(f => ({ ...f, image: e.target.value }))} placeholder="/storage/gallery/foto.jpg" className={inputClass} /></div>
+              <button type="submit" className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2">
+                <FiSave className="w-4 h-4" /> {tr('admin_save')}
+              </button>
+            </form>
+          </div>
         )}
 
         {tab === 'programs' && (
-          <form onSubmit={handleProgramSubmit} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:border dark:border-gray-700 space-y-4">
-            <div>
-              <label className={labelClass}>{tr('admin_program_title')}</label>
-              <input type="text" value={programForm.title} onChange={e => setProgramForm(f => ({ ...f, title: e.target.value }))} className={inputClass} />
+          <div className="space-y-6">
+            <div className={card}>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">Data Program Saat Ini</h3>
+              {data.programs.length === 0 ? (
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">Belum ada data program</p>
+              ) : (
+                <div className="space-y-3">
+                  {data.programs.map(item => (
+                    <div key={item.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-sm font-semibold text-gray-800 dark:text-white">{item.title}</p>
+                        <span className={`text-[11px] font-medium px-2 py-0.5 rounded-md ${item.status === 'ongoing' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' : item.status === 'upcoming' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'}`}>
+                          {item.status}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{item.description}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{item.startDate} — {item.endDate}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <div>
-              <label className={labelClass}>{tr('admin_program_desc')}</label>
-              <textarea value={programForm.description} onChange={e => setProgramForm(f => ({ ...f, description: e.target.value }))} rows={3} className={inputClass + " resize-none"} />
-            </div>
-            <div>
-              <label className={labelClass}>{tr('admin_program_status')}</label>
-              <select value={programForm.status} onChange={e => setProgramForm(f => ({ ...f, status: e.target.value }))} className={inputClass}>
-                <option value="upcoming">{tr('admin_program_upcoming')}</option>
-                <option value="ongoing">{tr('admin_program_ongoing')}</option>
-                <option value="completed">{tr('admin_program_completed')}</option>
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className={labelClass}>{tr('admin_program_start')}</label>
-                <input type="date" value={programForm.startDate} onChange={e => setProgramForm(f => ({ ...f, startDate: e.target.value }))} className={inputClass} />
+
+            <form onSubmit={handleProgramSubmit} className={card + " space-y-4"}>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">Tambah Program Baru</h3>
+              <div><label className={labelClass}>{tr('admin_program_title')}</label><input type="text" value={programForm.title} onChange={e => setProgramForm(f => ({ ...f, title: e.target.value }))} className={inputClass} /></div>
+              <div><label className={labelClass}>{tr('admin_program_desc')}</label><textarea value={programForm.description} onChange={e => setProgramForm(f => ({ ...f, description: e.target.value }))} rows={3} className={inputClass + " resize-none"} /></div>
+              <div><label className={labelClass}>{tr('admin_program_status')}</label>
+                <select value={programForm.status} onChange={e => setProgramForm(f => ({ ...f, status: e.target.value }))} className={inputClass}>
+                  <option value="upcoming">{tr('admin_program_upcoming')}</option>
+                  <option value="ongoing">{tr('admin_program_ongoing')}</option>
+                  <option value="completed">{tr('admin_program_completed')}</option>
+                </select>
               </div>
-              <div>
-                <label className={labelClass}>{tr('admin_program_end')}</label>
-                <input type="date" value={programForm.endDate} onChange={e => setProgramForm(f => ({ ...f, endDate: e.target.value }))} className={inputClass} />
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className={labelClass}>{tr('admin_program_start')}</label><input type="date" value={programForm.startDate} onChange={e => setProgramForm(f => ({ ...f, startDate: e.target.value }))} className={inputClass} /></div>
+                <div><label className={labelClass}>{tr('admin_program_end')}</label><input type="date" value={programForm.endDate} onChange={e => setProgramForm(f => ({ ...f, endDate: e.target.value }))} className={inputClass} /></div>
               </div>
-            </div>
-            <button type="submit" className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2">
-              <FiSave className="w-4 h-4" /> {tr('admin_save')}
-            </button>
-          </form>
+              <button type="submit" className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2">
+                <FiSave className="w-4 h-4" /> {tr('admin_save')}
+              </button>
+            </form>
+          </div>
         )}
 
         {tab === 'settings' && (
-          <form onSubmit={handleSettingsSubmit} className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:border dark:border-gray-700 space-y-4">
-            <div>
-              <label className={labelClass}>{tr('admin_wp')}</label>
-              <input type="text" value={settingsForm.whatsapp} onChange={e => setSettingsForm(f => ({ ...f, whatsapp: e.target.value }))} placeholder="085817048266" className={inputClass} />
+          <div className="space-y-6">
+            <div className={card}>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">Pengaturan Saat Ini</h3>
+              {!data.settings ? (
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">Belum ada pengaturan</p>
+              ) : (
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                  <p><span className="font-medium text-gray-800 dark:text-white">WhatsApp:</span> +{data.settings.whatsapp}</p>
+                  <p><span className="font-medium text-gray-800 dark:text-white">Instagram:</span> @{data.settings.instagram}</p>
+                  <p><span className="font-medium text-gray-800 dark:text-white">Email:</span> {data.settings.email}</p>
+                </div>
+              )}
             </div>
-            <div>
-              <label className={labelClass}>{tr('admin_ig')}</label>
-              <input type="text" value={settingsForm.instagram} onChange={e => setSettingsForm(f => ({ ...f, instagram: e.target.value }))} placeholder="eexxvvn" className={inputClass} />
-            </div>
-            <div>
-              <label className={labelClass}>{tr('admin_email')}</label>
-              <input type="email" value={settingsForm.email} onChange={e => setSettingsForm(f => ({ ...f, email: e.target.value }))} placeholder="karangtarunasukamaju64@gmail.com" className={inputClass} />
-            </div>
-            <button type="submit" className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2">
-              <FiSave className="w-4 h-4" /> {tr('admin_save')}
-            </button>
-          </form>
+
+            <form onSubmit={handleSettingsSubmit} className={card + " space-y-4"}>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">Ubah Pengaturan</h3>
+              <div><label className={labelClass}>{tr('admin_wp')}</label><input type="text" value={settingsForm.whatsapp} onChange={e => setSettingsForm(f => ({ ...f, whatsapp: e.target.value }))} placeholder="085817048266" className={inputClass} /></div>
+              <div><label className={labelClass}>{tr('admin_ig')}</label><input type="text" value={settingsForm.instagram} onChange={e => setSettingsForm(f => ({ ...f, instagram: e.target.value }))} placeholder="eexxvvn" className={inputClass} /></div>
+              <div><label className={labelClass}>{tr('admin_email')}</label><input type="email" value={settingsForm.email} onChange={e => setSettingsForm(f => ({ ...f, email: e.target.value }))} placeholder="karangtarunasukamaju64@gmail.com" className={inputClass} /></div>
+              <button type="submit" className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2">
+                <FiSave className="w-4 h-4" /> {tr('admin_save')}
+              </button>
+            </form>
+          </div>
         )}
       </div>
 

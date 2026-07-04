@@ -35,7 +35,7 @@ export default function HeroSection() {
           {t('hero_badge')}
         </span>
 
-        <h1 className="text-display sm:text-[5rem] md:text-[6rem] lg:text-[7rem] font-black text-white leading-[0.95] tracking-[-0.04em] mb-8">
+        <h1 className="text-[2.5rem] sm:text-[5rem] md:text-[6rem] lg:text-[7rem] font-black text-white leading-[1.05] sm:leading-[0.95] tracking-[-0.03em] sm:tracking-[-0.04em] mb-6 sm:mb-8">
           {t('hero_title')}
         </h1>
 
