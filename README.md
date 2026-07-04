@@ -1,4 +1,4 @@
-# DOKUMENTASI PROYEK: LANDING PAGE KARANG TARUNA SUKAMAJU
+# DOKUMENTASI PROYEK: DIGITALISASI KARANG TARUNA SUKAMAJU
 **Dokumen Spesifikasi Fungsional dan Teknis**  
 *Versi Dokumen: 1.0.0*  
 *Tanggal Rilis: 4 Juli 2026*  
