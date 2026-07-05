@@ -1,14 +1,11 @@
 import { useTranslation } from '../i18n/useTranslation';
 import { FiExternalLink, FiMonitor, FiSmartphone, FiGlobe } from 'react-icons/fi';
 
-const services = [
-  { icon: FiMonitor, label_id: 'Pembuatan Website & Aplikasi', label_en: 'Website & App Development' },
-  { icon: FiSmartphone, label_id: 'Desain Grafis & Multimedia', label_en: 'Graphic Design & Multimedia' },
-  { icon: FiGlobe, label_id: 'Sistem Informasi Digital', label_en: 'Digital Information Systems' },
-];
+const serviceKeys = ['services_web', 'services_design', 'services_system'];
+const serviceIcons = [FiMonitor, FiSmartphone, FiGlobe];
 
 export default function ServicesSection() {
-  const { t, lang } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <section id="layanan" className="relative py-28 px-6 bg-white dark:bg-surface-dark transition-colors duration-300">
@@ -32,8 +29,8 @@ export default function ServicesSection() {
                 <span className="text-2xl font-black tracking-tight">SH</span>
               </div>
               <div>
-                <p className="text-sm font-semibold text-white/70 tracking-wider uppercase">Sukamaju Hub</p>
-                <p className="text-lg font-bold">Portal Layanan Digital</p>
+                <p className="text-sm font-semibold text-white/70 tracking-wider uppercase">{t('services_portal_name')}</p>
+                <p className="text-lg font-bold">{t('services_portal_title')}</p>
               </div>
             </div>
 
@@ -42,12 +39,12 @@ export default function ServicesSection() {
             </p>
 
             <div className="grid sm:grid-cols-3 gap-4 mb-8">
-              {services.map((s, i) => {
-                const Icon = s.icon;
+              {serviceKeys.map((key, i) => {
+                const Icon = serviceIcons[i];
                 return (
                   <div key={i} className="flex items-center gap-3 bg-white/10 backdrop-blur rounded-xl px-4 py-3">
                     <Icon className="w-5 h-5 text-white/70 flex-shrink-0" />
-                    <span className="text-sm font-medium text-white/90">{lang === 'id' ? s.label_id : s.label_en}</span>
+                    <span className="text-sm font-medium text-white/90">{t(key)}</span>
                   </div>
                 );
               })}

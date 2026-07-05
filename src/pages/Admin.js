@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../i18n/useTranslation';
 import { Link } from 'react-router-dom';
-import { useApp } from '../context/AppContext';
 import { FiSave, FiAlertCircle, FiCheckCircle, FiArrowLeft, FiUsers, FiImage, FiCalendar, FiSettings, FiRefreshCw } from 'react-icons/fi';
 
 const tabs = [
@@ -13,7 +12,6 @@ const tabs = [
 
 export default function Admin() {
   const { t: tr } = useTranslation();
-  const { theme, toggleTheme } = useApp();
   const [tab, setTab] = useState('members');
   const [toast, setToast] = useState(null);
   const [data, setData] = useState({ members: [], gallery: [], programs: [], settings: null });
@@ -50,7 +48,7 @@ export default function Admin() {
   const handleMemberSubmit = async (e) => {
     e.preventDefault();
     if (!memberForm.name || !memberForm.division || !memberForm.position) {
-      showToast('error', 'Semua field wajib diisi');
+      showToast('error', tr('admin_field_required'));
       return;
     }
     const slug = memberForm.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -69,7 +67,7 @@ export default function Admin() {
 
   const handleGallerySubmit = async (e) => {
     e.preventDefault();
-    if (!galleryForm.title || !galleryForm.image) { showToast('error', 'Judul dan URL gambar wajib diisi'); return; }
+    if (!galleryForm.title || !galleryForm.image) { showToast('error', tr('admin_field_image_required')); return; }
     try {
       const res = await fetch('/api/github-commit', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -83,7 +81,7 @@ export default function Admin() {
 
   const handleProgramSubmit = async (e) => {
     e.preventDefault();
-    if (!programForm.title) { showToast('error', 'Nama program wajib diisi'); return; }
+    if (!programForm.title) { showToast('error', tr('admin_field_name_required')); return; }
     try {
       const res = await fetch('/api/github-commit', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -97,7 +95,7 @@ export default function Admin() {
 
   const handleSettingsSubmit = async (e) => {
     e.preventDefault();
-    if (!settingsForm.whatsapp && !settingsForm.instagram && !settingsForm.email) { showToast('error', 'Isi minimal satu field'); return; }
+    if (!settingsForm.whatsapp && !settingsForm.instagram && !settingsForm.email) { showToast('error', tr('admin_field_min_one')); return; }
     try {
       const res = await fetch('/api/github-commit', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -112,6 +110,13 @@ export default function Admin() {
   const card = "bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg dark:border dark:border-gray-700";
   const inputClass = "w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-sm";
   const labelClass = "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1";
+
+  const statusBadge = (status) => {
+    const cls = status === 'ongoing' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' :
+      status === 'upcoming' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' :
+      'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300';
+    return <span className={`text-[11px] font-medium px-2 py-0.5 rounded-md ${cls}`}>{tr('admin_program_' + status)}</span>;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -143,14 +148,14 @@ export default function Admin() {
         {tab === 'members' && (
           <div className="space-y-6">
             <div className={card}>
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">Data Anggota Saat Ini</h3>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">{tr('admin_current_members')}</h3>
               {data.members.length === 0 ? (
-                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">Belum ada data anggota</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">{tr('admin_empty_members')}</p>
               ) : (
                 <div className="space-y-3">
                   {data.members.map(div => (
                     <div key={div.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
-                      <p className="text-sm font-semibold text-gray-800 dark:text-white mb-2">{div.division} ({div.members.length} anggota)</p>
+                      <p className="text-sm font-semibold text-gray-800 dark:text-white mb-2">{div.division} ({tr('admin_member_count').replace('{count}', div.members.length)})</p>
                       <div className="space-y-1.5">
                         {div.members.map((m, i) => (
                           <div key={i} className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
@@ -167,7 +172,7 @@ export default function Admin() {
             </div>
 
             <form onSubmit={handleMemberSubmit} className={card + " space-y-4"}>
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">Tambah Anggota Baru</h3>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{tr('admin_add_member')}</h3>
               <div><label className={labelClass}>{tr('admin_member_name')}</label><input type="text" value={memberForm.name} onChange={e => setMemberForm(f => ({ ...f, name: e.target.value }))} className={inputClass} /></div>
               <div><label className={labelClass}>{tr('admin_member_division')}</label><input type="text" value={memberForm.division} onChange={e => setMemberForm(f => ({ ...f, division: e.target.value }))} className={inputClass} /></div>
               <div><label className={labelClass}>{tr('admin_member_position')}</label><input type="text" value={memberForm.position} onChange={e => setMemberForm(f => ({ ...f, position: e.target.value }))} className={inputClass} /></div>
@@ -186,9 +191,9 @@ export default function Admin() {
         {tab === 'gallery' && (
           <div className="space-y-6">
             <div className={card}>
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">Data Galeri Saat Ini</h3>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">{tr('admin_current_gallery')}</h3>
               {data.gallery.length === 0 ? (
-                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">Belum ada data galeri</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">{tr('admin_empty_gallery')}</p>
               ) : (
                 <div className="space-y-3">
                   {data.gallery.map(item => (
@@ -207,7 +212,7 @@ export default function Admin() {
             </div>
 
             <form onSubmit={handleGallerySubmit} className={card + " space-y-4"}>
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">Tambah Galeri Baru</h3>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{tr('admin_add_gallery')}</h3>
               <div><label className={labelClass}>{tr('admin_gallery_title')}</label><input type="text" value={galleryForm.title} onChange={e => setGalleryForm(f => ({ ...f, title: e.target.value }))} className={inputClass} /></div>
               <div><label className={labelClass}>{tr('admin_gallery_desc')}</label><textarea value={galleryForm.description} onChange={e => setGalleryForm(f => ({ ...f, description: e.target.value }))} rows={3} className={inputClass + " resize-none"} /></div>
               <div><label className={labelClass}>{tr('admin_gallery_image')}</label><input type="text" value={galleryForm.image} onChange={e => setGalleryForm(f => ({ ...f, image: e.target.value }))} placeholder="/storage/gallery/foto.jpg" className={inputClass} /></div>
@@ -221,18 +226,16 @@ export default function Admin() {
         {tab === 'programs' && (
           <div className="space-y-6">
             <div className={card}>
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">Data Program Saat Ini</h3>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">{tr('admin_current_programs')}</h3>
               {data.programs.length === 0 ? (
-                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">Belum ada data program</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">{tr('admin_empty_programs')}</p>
               ) : (
                 <div className="space-y-3">
                   {data.programs.map(item => (
                     <div key={item.id} className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-1">
                         <p className="text-sm font-semibold text-gray-800 dark:text-white">{item.title}</p>
-                        <span className={`text-[11px] font-medium px-2 py-0.5 rounded-md ${item.status === 'ongoing' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300' : item.status === 'upcoming' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'}`}>
-                          {item.status}
-                        </span>
+                        {statusBadge(item.status)}
                       </div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">{item.description}</p>
                       <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{item.startDate} — {item.endDate}</p>
@@ -243,7 +246,7 @@ export default function Admin() {
             </div>
 
             <form onSubmit={handleProgramSubmit} className={card + " space-y-4"}>
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">Tambah Program Baru</h3>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{tr('admin_add_program')}</h3>
               <div><label className={labelClass}>{tr('admin_program_title')}</label><input type="text" value={programForm.title} onChange={e => setProgramForm(f => ({ ...f, title: e.target.value }))} className={inputClass} /></div>
               <div><label className={labelClass}>{tr('admin_program_desc')}</label><textarea value={programForm.description} onChange={e => setProgramForm(f => ({ ...f, description: e.target.value }))} rows={3} className={inputClass + " resize-none"} /></div>
               <div><label className={labelClass}>{tr('admin_program_status')}</label>
@@ -267,20 +270,20 @@ export default function Admin() {
         {tab === 'settings' && (
           <div className="space-y-6">
             <div className={card}>
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">Pengaturan Saat Ini</h3>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white mb-4">{tr('admin_current_settings')}</h3>
               {!data.settings ? (
-                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">Belum ada pengaturan</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-8">{tr('admin_empty_settings')}</p>
               ) : (
                 <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                  <p><span className="font-medium text-gray-800 dark:text-white">WhatsApp:</span> +{data.settings.whatsapp}</p>
-                  <p><span className="font-medium text-gray-800 dark:text-white">Instagram:</span> @{data.settings.instagram}</p>
-                  <p><span className="font-medium text-gray-800 dark:text-white">Email:</span> {data.settings.email}</p>
+                  <p><span className="font-medium text-gray-800 dark:text-white">{tr('admin_wp')}:</span> +{data.settings.whatsapp}</p>
+                  <p><span className="font-medium text-gray-800 dark:text-white">{tr('admin_ig')}:</span> @{data.settings.instagram}</p>
+                  <p><span className="font-medium text-gray-800 dark:text-white">{tr('admin_email')}:</span> {data.settings.email}</p>
                 </div>
               )}
             </div>
 
             <form onSubmit={handleSettingsSubmit} className={card + " space-y-4"}>
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">Ubah Pengaturan</h3>
+              <h3 className="text-sm font-semibold text-gray-800 dark:text-white">{tr('admin_edit_settings')}</h3>
               <div><label className={labelClass}>{tr('admin_wp')}</label><input type="text" value={settingsForm.whatsapp} onChange={e => setSettingsForm(f => ({ ...f, whatsapp: e.target.value }))} placeholder="085817048266" className={inputClass} /></div>
               <div><label className={labelClass}>{tr('admin_ig')}</label><input type="text" value={settingsForm.instagram} onChange={e => setSettingsForm(f => ({ ...f, instagram: e.target.value }))} placeholder="eexxvvn" className={inputClass} /></div>
               <div><label className={labelClass}>{tr('admin_email')}</label><input type="email" value={settingsForm.email} onChange={e => setSettingsForm(f => ({ ...f, email: e.target.value }))} placeholder="karangtarunasukamaju64@gmail.com" className={inputClass} /></div>

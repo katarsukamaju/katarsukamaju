@@ -90,8 +90,8 @@ export default function ContactSection() {
                     <FiMapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-[13px] font-semibold tracking-wide">Lokasi</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Sukamaju, Indonesia</p>
+                    <p className="text-[13px] font-semibold tracking-wide">{t('contact_location')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{t('contact_location_val')}</p>
                   </div>
                 </div>
               </div>
